@@ -1,0 +1,17 @@
+{
+  "users": [
+    {
+      "id": "5477c24e-f2ab-4a98-a8ae-781614322e31",
+      "fullName": "Samuel Motomby",
+      "username": "samuel",
+      "email": "motombysamuel843@gmail.com",
+      "password": "$2a$12$I/i/7j.Z0m.4ntDTqvWCZ.6n1BXDQ5UpRxsDxBf7FBlK0Lx2Iefxy",
+      "bio": "",
+      "profilePictureUrl": "",
+      "createdAt": "2026-07-31T12:36:48.531Z"
+    }
+  ],
+  "courses": [],
+  "enrollments": [],
+  "reviews": []
+}

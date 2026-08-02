@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+learning-app/node_modules/
+server/node_modules/
+
+# Production builds
+learning-app/build/
+
+# Env files
+.env
+.env.local
+server/.env
+learning-app/.env
+learning-app/.env.local
+
+# OS files
+.DS_Store
