@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
-import { useAuth } from '../context/AuthContext';
 import { Icons } from '../components/Icons';
 
 const getStrength = (pw) => {
@@ -12,7 +11,6 @@ const getStrength = (pw) => {
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [form, setForm] = useState({ fullName: '', username: '', email: '', password: '', confirmPassword: '' });
   const [show, setShow] = useState({ pw: false, cpw: false });
   const [error, setError] = useState('');
