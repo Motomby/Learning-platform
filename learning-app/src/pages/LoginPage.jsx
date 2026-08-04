@@ -45,21 +45,20 @@ const LoginPage = () => {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-header">
-          <div className="auth-logo">🎓</div>
+          <div className="auth-logo">E-Learning</div>
           <h1>Welcome back</h1>
           <p>Sign in to continue your learning journey</p>
         </div>
 
-        {/* Show redirect notice if coming from protected route */}
         {location.state?.from && (
           <div className="alert alert-info" style={{ marginBottom: 24 }}>
-            <span>🔐</span> Please log in to access that page.
+            Please log in to access that page.
           </div>
         )}
 
         {error && (
           <div className="alert alert-error" style={{ marginBottom: 24 }}>
-            <span>⚠️</span> {error}
+            {error}
           </div>
         )}
 
@@ -67,21 +66,18 @@ const LoginPage = () => {
           {/* Email */}
           <div className="form-group">
             <label className="form-label" htmlFor="login-email">Email Address</label>
-            <div className="input-icon-wrapper">
-              <span className="input-icon">✉️</span>
-              <input
-                id="login-email"
-                className="form-input"
-                type="email"
-                name="email"
-                placeholder="john@example.com"
-                value={form.email}
-                onChange={handleChange}
-                autoComplete="email"
-                autoFocus
-                required
-              />
-            </div>
+            <input
+              id="login-email"
+              className="form-input"
+              type="email"
+              name="email"
+              placeholder="Enter your email"
+              value={form.email}
+              onChange={handleChange}
+              autoComplete="email"
+              autoFocus
+              required
+            />
           </div>
 
           {/* Password */}
@@ -90,7 +86,6 @@ const LoginPage = () => {
               <label className="form-label" htmlFor="login-password">Password</label>
             </div>
             <div className="input-icon-wrapper">
-              <span className="input-icon">🔒</span>
               <input
                 id="login-password"
                 className="form-input"
@@ -109,7 +104,7 @@ const LoginPage = () => {
                 tabIndex={-1}
                 style={{ paddingRight: 16 }}
               >
-                {showPassword ? '🙈' : '👁️'}
+                {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
           </div>
@@ -133,7 +128,7 @@ const LoginPage = () => {
             fontSize: 13,
             color: 'var(--text-secondary)',
           }}>
-            🔐 Your account is protected with industry-standard JWT tokens and bcrypt password hashing.
+            Your account is protected with industry-standard JWT tokens and bcrypt password hashing.
           </div>
         </div>
 

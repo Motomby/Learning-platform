@@ -40,6 +40,18 @@ const userSchema = new Schema(
       default: '',
       trim: true,
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationCode: {
+      type: String,
+      select: false,
+    },
+    verificationCodeExpiresAt: {
+      type: Date,
+      select: false,
+    },
   },
   {
     timestamps: true,

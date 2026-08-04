@@ -37,9 +37,13 @@ const RegisterPage = () => {
     if (err) { setError(err); return; }
     setLoading(true);
     try {
-      const res = await api.post('/auth/register', { fullName: form.fullName.trim(), username: form.username.trim(), email: form.email.trim(), password: form.password });
-      login(res.data.user, res.data.token);
-      navigate('/dashboard');
+      await api.post('/auth/register', {
+        fullName: form.fullName.trim(),
+        username: form.username.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      });
+      navigate('/verify-email', { state: { email: form.email.trim() } });
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally { setLoading(false); }
@@ -70,7 +74,7 @@ const RegisterPage = () => {
             <label className="form-label" htmlFor="reg-fullName">Full Name</label>
             <div className="input-wrapper">
               <span className="input-icon"><Icons.User size={16} /></span>
-              <input id="reg-fullName" className="form-input" type="text" name="fullName" placeholder="John Doe" value={form.fullName} onChange={handleChange} autoComplete="name" />
+              <input id="reg-fullName" className="form-input" type="text" name="fullName" placeholder="Enter your full name" value={form.fullName} onChange={handleChange} autoComplete="name" />
             </div>
           </div>
 
@@ -80,14 +84,14 @@ const RegisterPage = () => {
               <label className="form-label" htmlFor="reg-username">Username</label>
               <div className="input-wrapper">
                 <span className="input-icon" style={{ fontSize: 13, fontWeight: 700 }}>@</span>
-                <input id="reg-username" className="form-input" type="text" name="username" placeholder="johndoe" value={form.username} onChange={handleChange} autoComplete="username" />
+                <input id="reg-username" className="form-input" type="text" name="username" placeholder="Choose a username" value={form.username} onChange={handleChange} autoComplete="username" />
               </div>
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="reg-email">Email</label>
               <div className="input-wrapper">
                 <span className="input-icon"><Icons.Mail size={16} /></span>
-                <input id="reg-email" className="form-input" type="email" name="email" placeholder="john@email.com" value={form.email} onChange={handleChange} autoComplete="email" />
+                <input id="reg-email" className="form-input" type="email" name="email" placeholder="Enter your email" value={form.email} onChange={handleChange} autoComplete="email" />
               </div>
             </div>
           </div>
