@@ -9,8 +9,9 @@ learning-app/build/
 # Env files
 .env
 .env.local
+.env.example
 server/.env
-learning-app/.env
+server/.env.example
 learning-app/.env.local
 
 # OS files

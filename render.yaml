@@ -27,7 +27,7 @@ services:
         sync: false
 
   # ======================================================================
-  #  FRONTEND — React Static Site (Optional: for split deployment)
+  #  FRONTEND — React Static Site
   # ======================================================================
   - type: web
     name: elearning-web
@@ -36,6 +36,8 @@ services:
     buildCommand: npm install && npm run build
     publishDir: build
     envVars:
+      - key: CI
+        value: "false"
       - key: REACT_APP_API_BASE_URL
         fromService:
           type: web
