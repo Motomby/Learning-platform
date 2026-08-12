@@ -35,7 +35,11 @@ const LoginPage = () => {
       login(res.data.user, res.data.token);
       navigate(redirectTo, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      if (!err.response) {
+        setError('Unable to reach backend API. Please verify server status & CORS settings.');
+      } else {
+        setError(err.response?.data?.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

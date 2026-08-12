@@ -43,7 +43,11 @@ const RegisterPage = () => {
       });
       navigate('/verify-email', { state: { email: form.email.trim() } });
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      if (!err.response) {
+        setError('Unable to reach backend API. Please verify server status & CORS settings.');
+      } else {
+        setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      }
     } finally { setLoading(false); }
   };
 
