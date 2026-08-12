@@ -8,9 +8,12 @@ const VerifyEmailPage = () => {
   const location = useLocation();
   const { login } = useAuth();
   const initialEmail = location.state?.email || '';
-  const [form, setForm] = useState({ email: initialEmail, code: '' });
+  const initialDevCode = location.state?.devCode || '';
+  const [form, setForm] = useState({ email: initialEmail, code: initialDevCode });
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState(
+    initialDevCode ? `Developer helper: your verification code is ${initialDevCode}` : ''
+  );
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -46,9 +49,15 @@ const VerifyEmailPage = () => {
       return;
     }
     setLoading(true);
+    setError('');
     try {
-      await api.post('/auth/resend-verification', { email: form.email.trim() });
-      setMessage('A new code was sent to your email.');
+      const res = await api.post('/auth/resend-verification', { email: form.email.trim() });
+      if (res.data?.devVerificationCode) {
+        setForm((prev) => ({ ...prev, code: res.data.devVerificationCode }));
+        setMessage(`New verification code sent! Dev code: ${res.data.devVerificationCode}`);
+      } else {
+        setMessage('A new code was sent to your email.');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Unable to resend code. Try again later.');
     } finally {

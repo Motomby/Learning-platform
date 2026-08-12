@@ -35,13 +35,18 @@ const RegisterPage = () => {
     if (err) { setError(err); return; }
     setLoading(true);
     try {
-      await api.post('/auth/register', {
+      const res = await api.post('/auth/register', {
         fullName: form.fullName.trim(),
         username: form.username.trim(),
         email: form.email.trim(),
         password: form.password,
       });
-      navigate('/verify-email', { state: { email: form.email.trim() } });
+      navigate('/verify-email', {
+        state: {
+          email: form.email.trim(),
+          devCode: res.data?.devVerificationCode || '',
+        },
+      });
     } catch (err) {
       if (!err.response) {
         setError('Unable to reach backend API. Please verify server status & CORS settings.');

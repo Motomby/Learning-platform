@@ -14,9 +14,12 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError('');
+    setUnverifiedEmail('');
   };
 
   const handleSubmit = async (e) => {
@@ -27,6 +30,7 @@ const LoginPage = () => {
     }
     setLoading(true);
     setError('');
+    setUnverifiedEmail('');
     try {
       const res = await api.post('/auth/login', {
         email: form.email.trim(),
@@ -38,7 +42,11 @@ const LoginPage = () => {
       if (!err.response) {
         setError('Unable to reach backend API. Please verify server status & CORS settings.');
       } else {
-        setError(err.response?.data?.message || 'Login failed. Please try again.');
+        const errorData = err.response?.data;
+        if (err.response?.status === 403 && errorData?.isVerified === false) {
+          setUnverifiedEmail(errorData.email || form.email.trim());
+        }
+        setError(errorData?.message || 'Login failed. Please try again.');
       }
     } finally {
       setLoading(false);
@@ -61,8 +69,20 @@ const LoginPage = () => {
         )}
 
         {error && (
-          <div className="alert alert-error" style={{ marginBottom: 24 }}>
+          <div className="alert alert-error" style={{ marginBottom: 16 }}>
             {error}
+          </div>
+        )}
+
+        {unverifiedEmail && (
+          <div style={{ marginBottom: 24, textAlign: 'center' }}>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => navigate('/verify-email', { state: { email: unverifiedEmail } })}
+            >
+              Verify Email Now →
+            </button>
           </div>
         )}
 

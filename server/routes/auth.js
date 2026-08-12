@@ -165,6 +165,7 @@ router.post('/register', async (req, res) => {
     res.status(201).json({
       message: 'Account created successfully. Check your email for the verification code.',
       email: normalizedEmail,
+      ...(NODE_ENV !== 'production' ? { devVerificationCode: verificationCode } : {}),
     });
   } catch (err) {
     console.error('Register error:', err);
@@ -249,7 +250,10 @@ router.post('/resend-verification', async (req, res) => {
 
     await sendVerificationEmail(normalizedEmail, user.fullName, verificationCode);
 
-    res.json({ message: 'A new verification code has been sent.' });
+    res.json({
+      message: 'A new verification code has been sent.',
+      ...(NODE_ENV !== 'production' ? { devVerificationCode: verificationCode } : {}),
+    });
   } catch (err) {
     console.error('Resend verification error:', err);
     res.status(500).json({ message: 'Server error. Please try again.' });
@@ -272,7 +276,11 @@ router.post('/login', async (req, res) => {
     }
 
     if (!user.isVerified) {
-      return res.status(403).json({ message: 'Email not verified. Please verify your account before logging in.' });
+      return res.status(403).json({
+        message: 'Email not verified. Please verify your account before logging in.',
+        isVerified: false,
+        email: user.email,
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
