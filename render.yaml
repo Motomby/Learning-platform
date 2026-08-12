@@ -5,13 +5,13 @@
 
 services:
   # ======================================================================
-  #  BACKEND — Node/Express API & Fullstack Web Service
+  #  BACKEND — Node/Express API Server (Web Service)
   # ======================================================================
   - type: web
     name: elearning-api
     runtime: node
-    buildCommand: npm run build
-    startCommand: npm start
+    buildCommand: npm install --prefix server
+    startCommand: npm start --prefix server
     envVars:
       - key: NODE_ENV
         value: production
@@ -29,12 +29,10 @@ services:
   # ======================================================================
   #  FRONTEND — React Static Site
   # ======================================================================
-  - type: web
+  - type: static
     name: elearning-web
-    runtime: static
-    rootDir: learning-app
-    buildCommand: npm install && npm run build
-    publishDir: build
+    buildCommand: npm install --prefix learning-app && npm run build --prefix learning-app
+    publishDir: learning-app/build
     envVars:
       - key: CI
         value: "false"
