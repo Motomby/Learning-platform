@@ -58,22 +58,18 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div style={{
-          position: 'absolute', top: 'var(--nav-h)', left: 0, right: 0,
-          background: 'var(--bg-1)', borderBottom: '1px solid var(--border-0)',
-          padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 4, zIndex: 999,
-        }}>
+        <div className="mobile-menu">
           {[['/', 'Home'], ['/courses', 'Courses'], ...(isAuthenticated ? [['/dashboard', 'Dashboard']] : [])].map(([href, label]) => (
-            <Link key={href} to={href} className="btn btn-ghost" style={{ justifyContent: 'flex-start' }} onClick={() => setMenuOpen(false)}>{label}</Link>
+            <Link key={href} to={href} className="btn btn-ghost mobile-menu-link" onClick={() => setMenuOpen(false)}>{label}</Link>
           ))}
-          <div style={{ height: 1, background: 'var(--border-0)', margin: '4px 0' }} />
+          <div className="mobile-menu-divider" />
           {!isAuthenticated ? (
             <>
-              <Link to="/login" className="btn btn-secondary" onClick={() => setMenuOpen(false)}>Log In</Link>
-              <Link to="/register" className="btn btn-primary" onClick={() => setMenuOpen(false)}>Get Started</Link>
+              <Link to="/login" className="btn btn-secondary mobile-menu-btn" onClick={() => setMenuOpen(false)}>Log In</Link>
+              <Link to="/register" className="btn btn-primary mobile-menu-btn" onClick={() => setMenuOpen(false)}>Get Started</Link>
             </>
           ) : (
-            <button className="btn btn-ghost" onClick={handleLogout} style={{ justifyContent: 'flex-start', gap: 8 }}>
+            <button className="btn btn-ghost mobile-menu-link" onClick={handleLogout} style={{ gap: 8 }}>
               <Icons.LogOut size={14} /> Sign Out
             </button>
           )}

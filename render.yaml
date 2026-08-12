@@ -1,0 +1,44 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  Render Blueprint — E-Learning Platform
+#  Upload this file in Render: Blueprints → "New from YAML"
+# ═══════════════════════════════════════════════════════════════════════════
+
+services:
+  # ======================================================================
+  #  BACKEND — Node/Express API & Fullstack Web Service
+  # ======================================================================
+  - type: web
+    name: elearning-api
+    runtime: node
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: "7d"
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+  # ======================================================================
+  #  FRONTEND — React Static Site (Optional: for split deployment)
+  # ======================================================================
+  - type: web
+    name: elearning-web
+    runtime: static
+    rootDir: learning-app
+    buildCommand: npm install && npm run build
+    publishDir: build
+    envVars:
+      - key: REACT_APP_API_BASE_URL
+        fromService:
+          type: web
+          name: elearning-api
+          property: host
+        transformation: https://$VALUE/api

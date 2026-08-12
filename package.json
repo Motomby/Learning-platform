@@ -1,0 +1,9 @@
+{
+  "name": "e-learning-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm install --prefix learning-app && npm run build --prefix learning-app && npm install --prefix server",
+    "start": "npm start --prefix server"
+  }
+}

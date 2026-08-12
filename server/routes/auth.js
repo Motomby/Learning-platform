@@ -8,10 +8,12 @@ const User = require('../models/User');
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'local-dev-jwt-secret';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const EMAIL_FROM = process.env.EMAIL_FROM || 'no-reply@elearning.local';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 let transporter;
-let usingTestAccount = false;
+let emailMode = 'unset';
 
 async function createTransporter() {
   if (transporter) return transporter;
@@ -27,17 +29,19 @@ async function createTransporter() {
       host: smtpHost,
       port: smtpPort,
       secure: smtpSecure,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
+      auth: { user: smtpUser, pass: smtpPass },
     });
-    usingTestAccount = false;
+    emailMode = 'smtp';
+    console.info('📧 Email: using configured SMTP transport');
     return transporter;
   }
 
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('SMTP is not configured in production. Please set SMTP_HOST, SMTP_USER, and SMTP_PASS.');
+  if (NODE_ENV === 'production') {
+    console.warn('📧 [WARNING] SMTP not configured in production. Falling back to console-only email delivery.');
+    console.warn('   Set SMTP_HOST, SMTP_USER, SMTP_PASS env vars to enable real email sending.');
+    emailMode = 'console';
+    transporter = null;
+    return null;
   }
 
   const testAccount = await nodemailer.createTestAccount();
@@ -45,22 +49,16 @@ async function createTransporter() {
     host: testAccount.smtp.host,
     port: testAccount.smtp.port,
     secure: testAccount.smtp.secure,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
-    },
+    auth: { user: testAccount.user, pass: testAccount.pass },
   });
-  usingTestAccount = true;
-  console.info('Using Nodemailer test account for email delivery. Preview URL will be logged.');
+  emailMode = 'ethereal';
+  console.info('📧 Email: using Nodemailer Ethereal test account (preview URL logged)');
   return transporter;
 }
 
 async function sendVerificationEmail(email, fullName, code) {
-  const message = {
-    from: EMAIL_FROM,
-    to: email,
-    subject: 'E-Learning verification code',
-    text: `Hello ${fullName},
+  const subject = 'E-Learning verification code';
+  const text = `Hello ${fullName},
 
 Use this code to verify your email address:
 
@@ -69,15 +67,26 @@ ${code}
 This code expires in 5 minutes.
 
 If you did not sign up, ignore this email.
-`,
-  };
+`;
 
   const transport = await createTransporter();
+
+  if (emailMode === 'console' || !transport) {
+    console.log('\n══════════════════════════════════════════');
+    console.log(`📧 [EMAIL CONSOLE FALLBACK] To: ${email}`);
+    console.log(`   Subject: ${subject}`);
+    console.log(`   Verification Code: ${code}`);
+    console.log('   (User must see this code to complete verification)');
+    console.log('══════════════════════════════════════════\n');
+    return;
+  }
+
+  const message = { from: EMAIL_FROM, to: email, subject, text };
   const info = await transport.sendMail(message);
 
-  if (usingTestAccount) {
+  if (emailMode === 'ethereal') {
     const previewUrl = nodemailer.getTestMessageUrl(info);
-    console.info('Verification email preview URL:', previewUrl);
+    console.info('📧 Email preview URL:', previewUrl);
   }
 }
 
@@ -201,7 +210,7 @@ router.post('/verify-email', async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, username: user.username },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: JWT_EXPIRES_IN }
     );
 
     res.json({
@@ -274,7 +283,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, username: user.username },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: JWT_EXPIRES_IN }
     );
 
     res.json({

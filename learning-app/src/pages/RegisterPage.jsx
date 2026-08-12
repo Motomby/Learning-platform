@@ -143,9 +143,9 @@ const RegisterPage = () => {
           </button>
         </form>
 
-        <div className="security-badge" style={{ marginTop: 16 }}>
+        <div className="security-badge">
           <Icons.Shield size={14} />
-          <span>Your password is hashed with bcrypt. We never store it in plain text.</span>
+  
         </div>
 
         <div className="auth-footer">

@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 import { StarRating, StarPicker } from '../components/StarRating';
+import { Icons } from '../components/Icons';
 
 /* ══════════════════════════════════════════════════════════════════
    HELPERS
@@ -24,68 +25,38 @@ const ModuleList = ({ modules = [] }) => {
   if (!modules.length) return null;
 
   return (
-    <div style={{ marginTop: 40 }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
-         Course Curriculum
-        <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-muted)' }}>
+    <div className="curriculum-section">
+      <div className="curriculum-header">
+        <h2 className="curriculum-title">Course Curriculum</h2>
+        <span className="curriculum-count">
           {modules.length} module{modules.length !== 1 ? 's' : ''}
         </span>
-      </h2>
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {modules.map((mod, idx) => (
-          <div key={mod.id || idx} style={{
-            background: 'var(--bg-card)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md)',
-            overflow: 'hidden',
-            transition: 'var(--transition)',
-          }}>
+          <div key={mod.id || idx} className={`module-item ${open === idx ? 'open' : ''}`}>
             {/* Module header */}
             <button
               type="button"
+              className="module-btn"
               onClick={() => setOpen(open === idx ? null : idx)}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-                padding: '14px 18px', background: 'none', border: 'none',
-                cursor: 'pointer', textAlign: 'left', transition: 'var(--transition)',
-              }}
               id={`module-toggle-${idx}`}
             >
-              <div style={{
-                width: 28, height: 28, borderRadius: '50%',
-                background: open === idx ? 'var(--primary)' : 'rgba(108,99,255,0.2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 700, fontSize: 12, color: open === idx ? 'white' : 'var(--primary-light)',
-                flexShrink: 0, transition: 'var(--transition)',
-              }}>
-                {idx + 1}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--text-primary)', marginBottom: 2 }}>
-                  {mod.title}
-                </div>
+              <span className="module-number">{idx + 1}</span>
+              <div className="module-info">
+                <div className="module-title">{mod.title}</div>
                 {mod.duration && (
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>⏱ {mod.duration}</div>
+                  <div className="module-duration">⏱ {mod.duration}</div>
                 )}
               </div>
-              <span style={{ color: 'var(--text-muted)', fontSize: 18, transform: open === idx ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>›</span>
+              <span className="module-chevron">›</span>
             </button>
 
             {/* Module body */}
             {open === idx && (mod.description || mod.videoUrl) && (
-              <div style={{
-                padding: '0 18px 18px 60px',
-                borderTop: '1px solid var(--border)',
-                paddingTop: 14,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 12,
-                animation: 'fadeIn 0.2s ease',
-              }}>
+              <div className="module-body">
                 {mod.description && (
-                  <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-                    {mod.description}
-                  </p>
+                  <p className="module-desc">{mod.description}</p>
                 )}
                 {mod.videoUrl && (
                   <a
@@ -113,32 +84,22 @@ const ModuleList = ({ modules = [] }) => {
 const ReviewCard = ({ review }) => {
   const initials = (review.username || 'U').slice(0, 2).toUpperCase();
   return (
-    <div style={{
-      background: 'var(--bg-card)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-md)',
-      padding: '18px 20px',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 12 }}>
-        <div style={{
-          width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
-          background: 'var(--gradient-primary)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontWeight: 700, fontSize: 13, color: 'white',
-        }}>
+    <div className="review-card">
+      <div className="review-card-header">
+        <div className="review-avatar">
           {initials}
         </div>
-        <div style={{ flex: 1 }}>
+        <div className="review-meta">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 700, fontSize: 14 }}>@{review.username}</span>
+            <span className="review-username">@{review.username}</span>
             <StarRating rating={review.rating} size={13} showNumber={false} />
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 'auto' }}>
+            <span className="review-date">
               {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
         </div>
       </div>
-      <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7, margin: 0 }}>
+      <p className="review-comment">
         {review.comment}
       </p>
     </div>
@@ -172,16 +133,10 @@ const ReviewForm = ({ courseId, onSubmitted }) => {
   };
 
   return (
-    <div style={{
-      background: 'rgba(108,99,255,0.06)',
-      border: '1px solid var(--border)',
-      borderRadius: 'var(--radius-md)',
-      padding: 24,
-      marginBottom: 24,
-    }}>
+    <div className="review-form-card">
       <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>✍️ Write a Review</h3>
       {success && <div className="alert alert-success" style={{ marginBottom: 16 }}>{success}</div>}
-      {error && <div className="alert alert-error" style={{ marginBottom: 16 }}><span>⚠️</span> {error}</div>}
+      {error && <div className="alert alert-error" style={{ marginBottom: 16 }}><Icons.AlertCircle size={16} /> {error}</div>}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div className="form-group">
           <label className="form-label">Your Rating *</label>
@@ -199,7 +154,7 @@ const ReviewForm = ({ courseId, onSubmitted }) => {
           />
         </div>
         <button id="submit-review-btn" type="submit" className="btn btn-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
-          {loading ? <><span className="spinner" /> Submitting...</> : '📤 Submit Review'}
+          {loading ? <><span className="spinner spinner-sm" /> Submitting...</> : '📤 Submit Review'}
         </button>
       </form>
     </div>
@@ -489,20 +444,16 @@ const CourseDetailPage = () => {
     <div className="page-wrapper">
 
       {/* ══ Hero Section ══════════════════════════════════════════ */}
-      <section style={{
-        background: 'var(--gradient-hero)',
-        borderBottom: '1px solid var(--border)',
-        paddingBottom: 0,
-      }}>
-        <div className="container" style={{ padding: '48px 24px 0' }}>
+      <section className="course-detail-hero">
+        <div className="container">
           {/* Back */}
-          <Link to="/courses" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', fontSize: 14, marginBottom: 28, fontWeight: 500 }}>
+          <Link to="/courses" className="course-detail-back">
             ← Back to Courses
           </Link>
 
           <div className="course-detail-grid">
             {/* ── Left: Course Info ── */}
-            <div style={{ paddingBottom: 48 }}>
+            <div className="course-detail-main">
               <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
                 <span className={`badge ${LEVEL_COLOR[course.level] || 'badge-primary'}`}>{course.level}</span>
                 <span className="badge badge-primary">{course.category}</span>
@@ -512,25 +463,25 @@ const CourseDetailPage = () => {
               <h1 style={{ fontSize: 'clamp(1.6rem, 4vw, 2.4rem)', marginBottom: 18, lineHeight: 1.3 }}>
                 {course.title}
               </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 16, lineHeight: 1.8, marginBottom: 24 }}>
+              <p style={{ color: 'var(--text-1)', fontSize: 16, lineHeight: 1.8, marginBottom: 24 }}>
                 {course.description}
               </p>
 
               {/* Rating Summary */}
               {reviewCount > 0 && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+                <div className="reviews-summary">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontWeight: 800, fontSize: 22, color: 'var(--accent-gold)' }}>{avgRating.toFixed(1)}</span>
+                    <span className="reviews-avg">{avgRating.toFixed(1)}</span>
                     <StarRating rating={avgRating} size={18} showNumber={false} />
                   </div>
-                  <span style={{ color: 'var(--text-secondary)', fontSize: 14 }}>
+                  <span style={{ color: 'var(--text-1)', fontSize: 14 }}>
                     ({reviewCount} review{reviewCount !== 1 ? 's' : ''})
                   </span>
                 </div>
               )}
 
               {/* Meta */}
-              <div className="course-meta-list">
+              <div className="course-meta-grid">
                 <div className="course-meta-item"><span>👤</span><strong>{course.instructorName}</strong></div>
                 {course.duration && <div className="course-meta-item"><span>⏱️</span>{course.duration}</div>}
                 <div className="course-meta-item"><span>👥</span>{course.enrolledCount} enrolled</div>
@@ -552,11 +503,11 @@ const CourseDetailPage = () => {
                       🗑️ Delete Course
                     </button>
                   ) : (
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 14px', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: 'var(--radius-md)' }}>
-                      <span style={{ fontSize: 13, color: '#ff9999' }}>⚠️ Confirm delete?</span>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 14px', background: 'var(--error-bg)', border: '1px solid var(--error-border)', borderRadius: 'var(--radius-md)', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 13, color: '#ff8fa3' }}>⚠️ Confirm delete?</span>
                       <button className="btn btn-ghost btn-sm" onClick={() => setDeleteConfirm(false)} disabled={deleteLoading}>Cancel</button>
                       <button id="confirm-delete-btn" className="btn btn-danger btn-sm" onClick={handleDelete} disabled={deleteLoading}>
-                        {deleteLoading ? <span className="spinner" style={{ width: 14, height: 14 }} /> : 'Yes, Delete'}
+                        {deleteLoading ? <span className="spinner spinner-sm" /> : 'Yes, Delete'}
                       </button>
                     </div>
                   )}
@@ -565,26 +516,20 @@ const CourseDetailPage = () => {
             </div>
 
             {/* ── Right: Sticky CTA Card ── */}
-            <div className="course-detail-sticky" style={{ marginBottom: 48 }}>
-              {/* Thumbnail */}
-              <div style={{
-                width: '100%', aspectRatio: '16/9',
-                background: 'linear-gradient(135deg, #1e1b4b, #0f4f40)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 64,
-                overflow: 'hidden',
-              }}>
+            <div className="course-detail-sidebar">
+              <div className="course-detail-sidebar-thumb">
                 {course.thumbnail
-                  ? <img src={course.thumbnail} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <span>{EMOJI_MAP[course.category] || '📚'}</span>
+                  ? <img src={course.thumbnail} alt={course.title} />
+                  : <span style={{ fontSize: 56 }}>{EMOJI_MAP[course.category] || '📚'}</span>
                 }
               </div>
 
-              <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div className="course-detail-sidebar-body">
                 {/* Price */}
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-                  <span style={{ fontSize: 28, fontWeight: 800, color: 'var(--secondary)' }}>{course.price}</span>
+                  <span className={`course-price ${course.price === 'Free' ? 'course-price-free' : 'course-price-paid'}`} style={{ fontSize: 28 }}>{course.price}</span>
                   {course.price !== 'Free' && (
-                    <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>one-time</span>
+                    <span style={{ fontSize: 13, color: 'var(--text-2)' }}>one-time</span>
                   )}
                 </div>
 
@@ -592,17 +537,15 @@ const CourseDetailPage = () => {
                 <EnrollSection course={course} isOwner={isOwner} />
 
                 {/* Course includes */}
-                <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 10 }}>
-                    This course includes:
-                  </div>
+                <div className="enroll-includes">
+                  <div className="enroll-includes-title">This course includes:</div>
                   {[
                     course.modules?.length > 0 && `📑 ${course.modules.length} module${course.modules.length !== 1 ? 's' : ''}`,
                     course.duration && `⏱️ ${course.duration} of content`,
                     '📱 Access on all devices',
                     '🏆 Certificate on completion',
                   ].filter(Boolean).map((item, i) => (
-                    <div key={i} style={{ fontSize: 13, color: 'var(--text-secondary)', padding: '5px 0', display: 'flex', gap: 8 }}>
+                    <div key={i} className="enroll-include-item">
                       {item}
                     </div>
                   ))}
@@ -623,14 +566,14 @@ const CourseDetailPage = () => {
           )}
 
           {/* ── Reviews Section ─────────────────────────────── */}
-          <div style={{ marginTop: 56 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, flexWrap: 'wrap' }}>
-              <h2 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>⭐ Reviews</h2>
+          <div className="reviews-section">
+            <div className="reviews-header">
+              <h2 className="reviews-title">⭐ Reviews</h2>
               {reviewCount > 0 && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontWeight: 800, fontSize: 20, color: 'var(--accent-gold)' }}>{avgRating.toFixed(1)}</span>
+                <div className="reviews-summary">
+                  <span className="reviews-avg">{avgRating.toFixed(1)}</span>
                   <StarRating rating={avgRating} size={16} showNumber={false} />
-                  <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>({reviewCount})</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-1)' }}>({reviewCount})</span>
                 </div>
               )}
             </div>
@@ -644,8 +587,8 @@ const CourseDetailPage = () => {
             {!isOwner && isAuthenticated && !enrolled && (
               <div style={{
                 padding: 20, marginBottom: 24, textAlign: 'center',
-                background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--border)',
-                borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)', fontSize: 14,
+                background: 'rgba(255,255,255,0.02)', border: '1px dashed var(--border-0)',
+                borderRadius: 'var(--radius-md)', color: 'var(--text-1)', fontSize: 14,
               }}>
                 🔒 You must be enrolled to leave a review.
               </div>
@@ -655,8 +598,8 @@ const CourseDetailPage = () => {
             {!isAuthenticated && (
               <div style={{
                 padding: 20, marginBottom: 24, textAlign: 'center',
-                background: 'rgba(255,255,255,0.03)', border: '1px dashed var(--border)',
-                borderRadius: 'var(--radius-md)', color: 'var(--text-secondary)', fontSize: 14,
+                background: 'rgba(255,255,255,0.02)', border: '1px dashed var(--border-0)',
+                borderRadius: 'var(--radius-md)', color: 'var(--text-1)', fontSize: 14,
               }}>
                 <Link to="/login">Log in</Link> and enroll to leave a review.
               </div>

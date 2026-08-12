@@ -115,26 +115,13 @@ const LoginPage = () => {
             className="btn btn-primary btn-full btn-lg"
             disabled={loading}
           >
-            {loading ? <><span className="spinner" /> Signing in...</> : 'Sign In'}
+            {loading ? <><span className="spinner spinner-sm" /> Signing in...</> : 'Sign In'}
           </button>
         </form>
 
-        <div style={{ margin: '24px 0', textAlign: 'center' }}>
-          <div style={{
-            padding: '16px 20px',
-            background: 'rgba(108,99,255,0.07)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-md)',
-            fontSize: 13,
-            color: 'var(--text-secondary)',
-          }}>
-            Your account is protected with industry-standard JWT tokens and bcrypt password hashing.
-          </div>
-        </div>
-
         <div className="auth-footer">
           New to LearnHub?{' '}
-          <Link to="/register" style={{ color: 'var(--primary-light)', fontWeight: 600 }}>
+          <Link to="/register" className="auth-footer-link">
             Create a free account
           </Link>
         </div>

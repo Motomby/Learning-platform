@@ -137,7 +137,7 @@ const HomePage = () => {
             </div>
             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--text-2)', fontSize: 15 }}>LearnHub</span>
           </div>
-          <p>© 2024 LearnHub. Built with passion for learners everywhere.</p>
+          <p>© 2026 LearnHub. Built with passion for learners everywhere.</p>
         </div>
       </footer>
     </div>

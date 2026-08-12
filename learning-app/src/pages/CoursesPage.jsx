@@ -58,15 +58,15 @@ const CoursesPage = () => {
   return (
     <div className="page-wrapper">
       {/* ── Page Header ─────────────────────────────────────────── */}
-      <div style={{ background: 'var(--gradient-hero)', borderBottom: '1px solid var(--border)' }}>
-        <div className="container" style={{ padding: '48px 24px 32px' }}>
+      <div className="courses-header">
+        <div className="container">
           {/* Title Row */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
+          <div className="courses-header-row">
             <div>
               <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', marginBottom: 8 }}>
-                 Explore <span className="gradient-text">Courses</span>
+                Explore <span className="gradient-text">Courses</span>
               </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
+              <p className="courses-header-count">
                 {loading ? 'Loading...' : `${courses.length} course${courses.length !== 1 ? 's' : ''} available`}
               </p>
             </div>
@@ -76,17 +76,15 @@ const CoursesPage = () => {
                 className="btn btn-primary"
                 onClick={() => navigate('/dashboard')}
               >
-                 Teach a Course
+                Teach a Course
               </button>
             )}
           </div>
 
           {/* ── Search Bar ──────────────────────────────────────── */}
-          <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
-            <div style={{ position: 'relative', flex: 1 }}>
-              <span style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }}>
-                
-              </span>
+          <form onSubmit={handleSearch} className="search-bar">
+            <div className="input-wrapper" style={{ flex: 1, minWidth: 0 }}>
+              <span className="input-icon">🔍</span>
               <input
                 id="courses-search-input"
                 className="form-input"
@@ -94,7 +92,6 @@ const CoursesPage = () => {
                 placeholder="Search by title, description, or category..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                style={{ paddingLeft: 46 }}
               />
             </div>
             <button type="submit" className="btn btn-primary" id="courses-search-btn">Search</button>
@@ -110,29 +107,28 @@ const CoursesPage = () => {
           </form>
 
           {/* ── Category Chips ───────────────────────────────────── */}
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+          <div className="filter-row">
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
-                className={`category-chip ${activeCategory === cat ? 'active' : ''}`}
+                className={`filter-chip ${activeCategory === cat ? 'active' : ''}`}
                 onClick={() => setActiveCategory(cat)}
                 id={`cat-${cat.replace(/\s+/g, '-').toLowerCase()}`}
               >
-                {cat === 'all' ? ' All' : `${EMOJI_MAP[cat] || ''} ${cat}`}
+                {cat === 'all' ? 'All' : `${EMOJI_MAP[cat] || ''} ${cat}`}
               </button>
             ))}
           </div>
 
           {/* ── Price Filter ─────────────────────────────────────── */}
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Price:</span>
+          <div className="courses-price-row">
+            <span className="courses-price-label">Price:</span>
             {PRICE_FILTERS.map(pf => (
               <button
                 key={pf.key}
-                className={`category-chip ${priceType === pf.key ? 'active' : ''}`}
+                className={`filter-chip ${priceType === pf.key ? 'active' : ''}`}
                 onClick={() => setPriceType(pf.key)}
                 id={`price-${pf.key}`}
-                style={{ fontSize: 12 }}
               >
                 {pf.label}
               </button>
@@ -151,8 +147,8 @@ const CoursesPage = () => {
 
         {loading ? (
           <div className="page-loading">
-            <div className="spinner" style={{ width: 44, height: 44, borderWidth: 3, borderTopColor: 'var(--primary)' }} />
-            <span style={{ color: 'var(--text-secondary)' }}>Loading courses...</span>
+            <div className="spinner" style={{ width: 44, height: 44, borderWidth: 3 }} />
+            <span style={{ color: 'var(--text-1)' }}>Loading courses...</span>
           </div>
         ) : courses.length === 0 ? (
           <div className="empty-state">
@@ -163,7 +159,7 @@ const CoursesPage = () => {
                 ? `No results for "${search}". Try different keywords or clear the search.`
                 : 'No courses match these filters yet. Be the first to create one!'}
             </p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 24 }}>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 24, flexWrap: 'wrap' }}>
               {(search || activeCategory !== 'all' || priceType !== 'all') && (
                 <button
                   className="btn btn-secondary"
@@ -185,10 +181,10 @@ const CoursesPage = () => {
               <Link
                 key={course.id}
                 to={`/courses/${course.id}`}
-                style={{ textDecoration: 'none', color: 'inherit' }}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'flex' }}
                 id={`course-card-${course.id}`}
               >
-                <div className="course-card" style={{ height: '100%' }}>
+                <div className="course-card" style={{ height: '100%', width: '100%' }}>
                   {/* Thumbnail */}
                   {course.thumbnail ? (
                     <img src={course.thumbnail} alt={course.title} className="course-thumbnail" />
@@ -200,7 +196,7 @@ const CoursesPage = () => {
 
                   <div className="course-card-body">
                     {/* Badges */}
-                    <div className="course-card-meta">
+                    <div className="course-card-tags">
                       <span className={`badge ${LEVELS[course.level] || 'badge-primary'}`}>
                         {course.level}
                       </span>
@@ -215,7 +211,7 @@ const CoursesPage = () => {
                     {course.reviewCount > 0 && (
                       <div style={{ margin: '8px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
                         <StarRating rating={course.rating} size={13} showNumber={true} />
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-2)' }}>
                           ({course.reviewCount} review{course.reviewCount !== 1 ? 's' : ''})
                         </span>
                       </div>
@@ -223,17 +219,16 @@ const CoursesPage = () => {
 
                     {/* Footer */}
                     <div className="course-card-footer">
-                      <div className="course-instructor">
-                        <span>👤</span>
-                        <span>{course.instructorName}</span>
+                      <div className="course-card-meta">
+                        <span className="course-card-meta-item">👤 {course.instructorName}</span>
                         {course.duration && (
-                          <><span>·</span><span>⏱ {course.duration}</span></>
+                          <span className="course-card-meta-item">⏱ {course.duration}</span>
                         )}
                         {course.enrolledCount > 0 && (
-                          <><span>·</span><span>👥 {course.enrolledCount}</span></>
+                          <span className="course-card-meta-item">👥 {course.enrolledCount}</span>
                         )}
                       </div>
-                      <span className="course-price">{course.price}</span>
+                      <span className={`course-price ${course.price === 'Free' ? 'course-price-free' : 'course-price-paid'}`}>{course.price}</span>
                     </div>
                   </div>
                 </div>
