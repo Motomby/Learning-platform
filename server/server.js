@@ -106,12 +106,15 @@ app.use((err, req, res, next) => {
 // ─── Startup Validations ─────────────────────────────────────────────────────
 function validateEnvironment() {
   const issues = [];
+  const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_URL || process.env.MONGO_URI;
+  const jwtSecret = process.env.JWT_SECRET || process.env.SECRET_KEY;
+
   if (NODE_ENV === 'production') {
-    if (!process.env.JWT_SECRET || process.env.JWT_SECRET.startsWith('local-dev-') || process.env.JWT_SECRET.startsWith('elearning_super_secret')) {
-      issues.push('⚠️  JWT_SECRET is using a dev value — override it in Render Environment Variables.');
+    if (!jwtSecret || jwtSecret.startsWith('local-dev-') || jwtSecret.startsWith('elearning_super_secret')) {
+      issues.push('⚠️  JWT_SECRET is using a dev/fallback value — set a custom JWT_SECRET in Render Environment Variables for production security.');
     }
-    if (!process.env.MONGODB_URI) {
-      issues.push('❌ MONGODB_URI is not set. The server cannot connect to MongoDB.');
+    if (!mongoUri) {
+      issues.push('❌ MONGODB_URI is not set. Please set MONGODB_URI (or MONGODB_URL) in your Render Environment Variables.');
     }
   }
   if (issues.length) {

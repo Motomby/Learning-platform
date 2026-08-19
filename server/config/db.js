@@ -78,7 +78,7 @@ async function seedDatabaseFromJson() {
 }
 
 async function connectToDatabase() {
-  const mongoUri = process.env.MONGODB_URI || DEFAULT_MONGO_URI;
+  const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_URL || process.env.MONGO_URI || DEFAULT_MONGO_URI;
 
   await mongoose.connect(mongoUri, {
     serverSelectionTimeoutMS: 5000,

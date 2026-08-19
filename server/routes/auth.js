@@ -7,7 +7,7 @@ require('dotenv').config();
 const User = require('../models/User');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'local-dev-jwt-secret';
+const JWT_SECRET = process.env.JWT_SECRET || process.env.SECRET_KEY || 'local-dev-jwt-secret';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 const EMAIL_FROM = process.env.EMAIL_FROM || 'no-reply@elearning.local';
 const NODE_ENV = process.env.NODE_ENV || 'development';
