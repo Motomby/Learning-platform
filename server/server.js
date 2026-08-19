@@ -12,11 +12,11 @@ const userRoutes = require('./routes/users');
 const courseRoutes = require('./routes/courses');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // ─── CORS ─────────────────────────────────────────────────────────────────────
-const CORS_ORIGINS = (process.env.CORS_ORIGINS || 'http://localhost:3000')
+const CORS_ORIGINS = (process.env.CORS_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5001,http://127.0.0.1:5001,http://localhost:5000,http://127.0.0.1:5000')
   .split(',')
   .map(o => o.trim())
   .filter(Boolean);

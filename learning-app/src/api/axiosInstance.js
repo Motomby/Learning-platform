@@ -1,18 +1,12 @@
 import axios from 'axios';
 
 const getDefaultBaseURL = () => {
-  if (process.env.REACT_APP_API_BASE_URL) {
-    return process.env.REACT_APP_API_BASE_URL;
-  }
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    return 'http://localhost:5001/api';
-  }
-  return '/api';
+  return process.env.REACT_APP_API_BASE_URL || 'https://learning-plat-y635.onrender.com';
 };
 
 const rawBaseURL = getDefaultBaseURL();
 const normalizeBaseURL = (url) => {
-  if (!url || url === '/api') return '/api';
+  if (!url) return 'https://learning-plat-y635.onrender.com/api';
   const trimmed = url.replace(/\/+$/, '');
   return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
 };
