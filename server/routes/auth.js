@@ -2,93 +2,82 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 require('dotenv').config();
 const User = require('../models/User');
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || process.env.SECRET_KEY || 'local-dev-jwt-secret';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
-const EMAIL_FROM = process.env.EMAIL_FROM || 'no-reply@elearning.local';
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const EMAIL_FROM = process.env.EMAIL_FROM || 'onboarding@resend.dev';
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-let transporter;
-let emailMode = 'unset';
+const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
-async function createTransporter() {
-  if (transporter) return transporter;
 
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const smtpPort = Number(process.env.SMTP_PORT) || 587;
-  const smtpSecure = process.env.SMTP_SECURE === 'true';
-
-  if (smtpHost && smtpUser && smtpPass) {
-    transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpSecure,
-      auth: { user: smtpUser, pass: smtpPass },
-    });
-    emailMode = 'smtp';
-    console.info('📧 Email: using configured SMTP transport');
-    return transporter;
-  }
-
-  if (NODE_ENV === 'production') {
-    console.warn('📧 [WARNING] SMTP not configured in production. Falling back to console-only email delivery.');
-    console.warn('   Set SMTP_HOST, SMTP_USER, SMTP_PASS env vars to enable real email sending.');
-    emailMode = 'console';
-    transporter = null;
-    return null;
-  }
-
-  const testAccount = await nodemailer.createTestAccount();
-  transporter = nodemailer.createTransport({
-    host: testAccount.smtp.host,
-    port: testAccount.smtp.port,
-    secure: testAccount.smtp.secure,
-    auth: { user: testAccount.user, pass: testAccount.pass },
-  });
-  emailMode = 'ethereal';
-  console.info('📧 Email: using Nodemailer Ethereal test account (preview URL logged)');
-  return transporter;
-}
 
 async function sendVerificationEmail(email, fullName, code) {
-  const subject = 'E-Learning verification code';
-  const text = `Hello ${fullName},
+  const subject = 'Your LearnHub Verification Code';
+  const html = `
+    <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e4e4e7; border-radius: 12px; background-color: #ffffff;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: #4f46e5; margin: 0; font-size: 24px;">LearnHub</h1>
+      </div>
+      <h2 style="color: #18181b; font-size: 20px; margin-bottom: 12px;">Hello ${fullName},</h2>
+      <p style="color: #52525b; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">
+        Thank you for joining LearnHub! Please use the 6-digit verification code below to complete your registration:
+      </p>
+      <div style="text-align: center; margin: 28px 0;">
+        <span style="background-color: #eef2ff; color: #4f46e5; font-size: 32px; font-weight: 800; letter-spacing: 6px; padding: 14px 28px; border-radius: 8px; border: 1px solid #c7d2fe; display: inline-block;">
+          ${code}
+        </span>
+      </div>
+      <p style="color: #71717a; font-size: 14px; margin-bottom: 24px;">
+        This code is valid for <strong>5 minutes</strong>. If you did not request this email, please ignore it.
+      </p>
+      <hr style="border: none; border-top: 1px solid #f4f4f5; margin: 24px 0;" />
+      <p style="color: #a1a1aa; font-size: 12px; text-align: center; margin: 0;">
+        © 2026 LearnHub. All rights reserved.
+      </p>
+    </div>
+  `;
+  const text = `Hello ${fullName},\n\nYour LearnHub verification code is: ${code}\n\nThis code expires in 5 minutes.\nIf you did not request this email, please ignore it.`;
 
-Use this code to verify your email address:
-
-${code}
-
-This code expires in 5 minutes.
-
-If you did not sign up, ignore this email.
-`;
-
-  const transport = await createTransporter();
-
-  if (emailMode === 'console' || !transport) {
+  if (!resend) {
+    console.warn('⚠️ RESEND_API_KEY is not set in environment.');
     console.log('\n══════════════════════════════════════════');
-    console.log(`📧 [EMAIL CONSOLE FALLBACK] To: ${email}`);
-    console.log(`   Subject: ${subject}`);
-    console.log(`   Verification Code: ${code}`);
-    console.log('   (User must see this code to complete verification)');
+    console.log(`📧 [CONSOLE FALLBACK] Verification Code for ${email}: ${code}`);
     console.log('══════════════════════════════════════════\n');
     return;
   }
 
-  const message = { from: EMAIL_FROM, to: email, subject, text };
-  const info = await transport.sendMail(message);
+  try {
 
-  if (emailMode === 'ethereal') {
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    console.info('📧 Email preview URL:', previewUrl);
+    const data = await resend.emails.send({
+      from: EMAIL_FROM,
+      to: email,
+      subject: subject,
+      html: html,
+      text: text,
+    });
+
+    if (data.error) {
+      console.error('❌ Resend API Error:', data.error);
+      console.log('\n══════════════════════════════════════════');
+      console.log(`📧 [CONSOLE FALLBACK] Verification Code for ${email}: ${code}`);
+      console.log('══════════════════════════════════════════\n');
+    } else {
+      console.info(`📧 Verification email sent successfully to ${email} via Resend`);
+    }
+  } catch (err) {
+    console.error('❌ Error sending email via Resend:', err);
+    console.log('\n══════════════════════════════════════════');
+    console.log(`📧 [CONSOLE FALLBACK] Verification Code for ${email}: ${code}`);
+    console.log('══════════════════════════════════════════\n');
   }
 }
+
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
